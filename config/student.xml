@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template  xmlns="http://www.w3.org/01"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="template.xsd">
+
+    <style>
+        <map>
+            <entry key="GB-2312">
+                {"key":"123"}
+            </entry>
+            <entry key="GB-2320">
+                {"key":"456"}
+            </entry>
+        </map>
+    </style>
+
+    <schema>
+        <id>student-list</id>
+        <canvas>
+            <layout>
+                <left>1</left>
+                <top>1</top>
+            </layout>
+            <widths>
+                <width>20</width>
+                <width>30</width>
+                <width>20</width>
+                <width>50</width>
+            </widths>
+        </canvas>
+        <sheet>
+            <![CDATA[
+			<table>
+			    <tr>
+			        <th type="title" colspan="4">学生信息表</th>
+			    </tr>
+			    <tr>
+			        <th>日期</th>
+			        <th>姓名</th>
+			        <th>年龄</th>
+			        <th>分数</th>
+			    </tr>
+			    {{range $a,$item := .}}
+			        {{/*   临时变量，学生列表长度     */}}
+			        {{$size := len $item.Students}}
+			        <tr>
+			            <td type="string" rowspan="{{$size}}">{{$item.Date}}</td>
+			            {{- $first := index $item.Students 0}}
+			            <td type="string">{{$first.Name}}</td>
+			            <td type="uint32">{{$first.Age}}</td>
+			            <td type="float64">{{$first.Score}}</td>
+			        </tr>
+			        {{range $i,$stu := $item.Students}}
+			            {{if $i}}
+			            <tr>
+			                <td type="string">{{$stu.Name}}</td>
+			                <td type="uint32">{{$stu.Age}}</td>
+			                <td type="float64">{{$stu.Score}}</td>
+			            </tr>
+			            {{end}}
+			        {{end}}
+			        <tr>
+			            <th>小计</th>
+			            <th/>
+			            <th/>
+			            <td type="formula" formula="SUM">4@$rowCount-1-{{$size}}:4@$rowCount-1</td>
+			        </tr>
+			    {{end}}
+			</table>
+			]]>
+        </sheet>
+    </schema>
+</template>
