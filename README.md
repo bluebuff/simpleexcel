@@ -6,12 +6,11 @@
 package main
 
 import (
-    "github.com/bluebuff/simple-excelize/v1/core"
-	"github.com/bluebuff/simple-excelize/v1/xml"
+    "github.com/bluebuff/simple-excelize/core"
+	"github.com/bluebuff/simple-excelize/xml"
 	"io/ioutil"
 	"time"
 )
-
 
 
 func main() {
@@ -49,9 +48,9 @@ package main
 
 import (
     "fmt"
-	"github.com/bluebuff/simple-excelize/v1/core"
-	"github.com/bluebuff/simple-excelize/v1/core/context"
-    "github.com/bluebuff/simple-excelize/v1/models"
+	"github.com/bluebuff/simple-excelize/core"
+	"github.com/bluebuff/simple-excelize/core/context"
+    "github.com/bluebuff/simple-excelize/models"
 	"io/ioutil"
 )
 
