@@ -5,6 +5,7 @@ import (
 	"github.com/beevik/etree"
 	"github.com/bluebuff/simple-excelize/core/common"
 	"github.com/bluebuff/simple-excelize/core/context"
+	"github.com/bluebuff/simple-excelize/models"
 	"github.com/bluebuff/simple-excelize/util"
 	"strings"
 )
@@ -78,8 +79,8 @@ func handleFormat(text, format string) string {
 	return fmt.Sprintf(format, startAxis, endAxis)
 }
 
-func parseAxis(axisExpress string) (*common.Axis, error) {
-	axis := new(common.Axis)
+func parseAxis(axisExpress string) (*models.Axis, error) {
+	axis := new(models.Axis)
 	expressArray := strings.Split(axisExpress, "@")
 	col, err := util.Process(expressArray[0])
 	if err != nil {
