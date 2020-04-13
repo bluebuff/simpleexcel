@@ -3,7 +3,7 @@ package xml
 import (
 	"bytes"
 	"fmt"
-	"github.com/bluebuff/simple-excelize/v1/core/context"
+	"github.com/bluebuff/simple-excelize/core/context"
 )
 
 type SheetScope struct {

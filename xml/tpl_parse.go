@@ -3,8 +3,8 @@ package xml
 import (
 	"errors"
 	"github.com/beevik/etree"
-	"github.com/bluebuff/simple-excelize/v1/models"
-	"github.com/bluebuff/simple-excelize/v1/util"
+	"github.com/bluebuff/simple-excelize/models"
+	"github.com/bluebuff/simple-excelize/util"
 	"strconv"
 	"strings"
 	"text/template"

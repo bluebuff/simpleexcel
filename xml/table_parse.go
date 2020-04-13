@@ -3,9 +3,9 @@ package xml
 import (
 	"fmt"
 	"github.com/beevik/etree"
-	"github.com/bluebuff/simple-excelize/v1/core/common"
-	"github.com/bluebuff/simple-excelize/v1/core/context"
-	"github.com/bluebuff/simple-excelize/v1/util"
+	"github.com/bluebuff/simple-excelize/core/common"
+	"github.com/bluebuff/simple-excelize/core/context"
+	"github.com/bluebuff/simple-excelize/util"
 	"strings"
 )
 

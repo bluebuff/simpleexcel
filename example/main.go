@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bluebuff/simple-excelize/v1/core"
-	"github.com/bluebuff/simple-excelize/v1/xml"
+	"github.com/bluebuff/simple-excelize/core"
+	"github.com/bluebuff/simple-excelize/xml"
 	"io/ioutil"
 	"time"
 )

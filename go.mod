@@ -1,4 +1,4 @@
-module github.com/bluebuff/simple-excelize/v1
+module github.com/bluebuff/simple-excelize
 
 go 1.13
 

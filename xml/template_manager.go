@@ -1,7 +1,7 @@
 package xml
 
 import (
-	"github.com/bluebuff/simple-excelize/v1/models"
+	"github.com/bluebuff/simple-excelize/models"
 	"sync"
 	"text/template"
 )

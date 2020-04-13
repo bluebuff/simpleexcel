@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"fmt"
-	"github.com/bluebuff/simple-excelize/v1/pkg/stack"
+	"github.com/bluebuff/simple-excelize/pkg/stack"
 	"strconv"
 	"strings"
 )

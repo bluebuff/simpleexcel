@@ -1,6 +1,6 @@
 package xml
 
-import "github.com/bluebuff/simple-excelize/v1/core/context"
+import "github.com/bluebuff/simple-excelize/core/context"
 
 type SheetTemplateEngine struct {
 	templateManager *TemplateManager
