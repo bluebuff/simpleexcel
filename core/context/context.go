@@ -17,6 +17,8 @@ type Context interface {
 	// 设置边界的位置，上下左右的偏移量，从1开始
 	SetLayout(layout *models.Layout)
 
+	GetLayout() models.Layout
+
 	// 设置大标题
 	SetTitle(value string, useStyle ...bool) string
 
@@ -141,6 +143,10 @@ func (ctx *context) SetLayout(layout *models.Layout) {
 	if layout.Bottom != 0 {
 		ctx.Layout.Bottom = layout.Bottom
 	}
+}
+
+func (ctx *context) GetLayout() models.Layout {
+	return ctx.Layout
 }
 
 func (ctx *context) SetColWidth(startIndex, endIndex int, width float64) {

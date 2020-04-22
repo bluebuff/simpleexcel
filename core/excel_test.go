@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bluebuff/simple-excelize/core/common"
 	"github.com/bluebuff/simple-excelize/core/context"
+	"github.com/bluebuff/simple-excelize/core/handle"
 	"github.com/bluebuff/simple-excelize/models"
 	"io/ioutil"
 	"testing"
@@ -12,9 +13,10 @@ import (
 func TestExcelBuilder_Build(t *testing.T) {
 	builder := NewExcelBuilder()
 	builder.RegisterStyle()
-	builder.JoinSheet("列表1", beforeHandle, theadHandler, tbodyHandler, tfootHandler, afterHandler)
+	builder.JoinSheet("列表1", beforeHandle,theadHandler, tbodyHandler, tfootHandler, afterHandler)
 	builder.JoinSheet("列表2", buildSheetFunc, afterHandler)
-	builder.Active("列表1")
+	builder.Active("列表2")
+	builder.After(handle.SetLayoutColWidth(50))
 	bytes, err := builder.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +33,7 @@ func beforeHandle(ctx context.Context) error {
 		Top:   2,
 		Right: 5,
 	})
-	ctx.SetColWidth(1, 2, 50)
+	ctx.SetColWidth(1, 2, 10)
 	return nil
 }
 
