@@ -1,6 +1,8 @@
 package standard
 
-import "github.com/bluebuff/simpleexcel/v2/style"
+import (
+	"github.com/bluebuff/simpleexcel/v2"
+)
 
 const (
 	titleStyle                   = `{"font":{"bold":true,"italic":false,"family":"正楷","size":18,"color":"#000000"},"alignment":{"horizontal":"center","vertical":"center"},"border":[{"type":"left","color":"#000000","style":1},{"type":"top","color":"#000000","style":1},{"type":"right","color":"#000000","style":1},{"type":"bottom","color":"#000000","style":1}]}`
@@ -17,29 +19,29 @@ const (
 	subtotalDecimalsCondition    = `{"fill":{"type":"pattern","pattern":1,"color":["#E8E8E8"]},"number_format":4,"alignment":{"horizontal":"right","vertical":"center"},"font":{"family":"Times New Roman","bold":false,"size":12,"color":"#FF0000"},"border":[{"type":"left","color":"#000000","style":1},{"type":"top","color":"#000000","style":1},{"type":"right","color":"#000000","style":1},{"type":"bottom","color":"#000000","style":1}]}`
 )
 
-func init() {
+func Style(styleMng simpleexcel.StyleManager) {
 	// 用于标题 例如明细总表大标题
-	style.Register(style.Title, style.NewStyle(titleStyle))
+	styleMng.Store(simpleexcel.Title, simpleexcel.NewStyleFunc(titleStyle))
 	// 用于头部
-	style.Register(style.Head, style.NewStyle(headStyle))
+	styleMng.Store(simpleexcel.Head, simpleexcel.NewStyleFunc(headStyle))
 	// 用于普通文本
-	style.Register(style.Text, style.NewStyle(textStyle))
+	styleMng.Store(simpleexcel.Text, simpleexcel.NewStyleFunc(textStyle))
 	// 用于数字
-	style.Register(style.Number, style.NewStyle(numberStyle))
+	styleMng.Store(simpleexcel.Number, simpleexcel.NewStyleFunc(numberStyle))
 	// 当符合条件时，数字使用条件样式
-	style.Register(style.NumberCondition, style.NewConditionStyle(numberConditionStyle))
+	styleMng.Store(simpleexcel.NumberCondition, simpleexcel.NewConditionStyleFunc(numberConditionStyle))
 	// 用于小数
-	style.Register(style.Decimals, style.NewStyle(decimalsStyle))
+	styleMng.Store(simpleexcel.Decimals, simpleexcel.NewStyleFunc(decimalsStyle))
 	// 用于小计（组合单位小计）
-	style.Register(style.SubtotalText, style.NewStyle(subtotalTextStyle))
+	styleMng.Store(simpleexcel.SubtotalText, simpleexcel.NewStyleFunc(subtotalTextStyle))
 	// 当符合条件时，小数使用条件样式
-	style.Register(style.DecimalsCondition, style.NewConditionStyle(decimalsConditionStyle))
+	styleMng.Store(simpleexcel.DecimalsCondition, simpleexcel.NewConditionStyleFunc(decimalsConditionStyle))
 	// 用于小计数量
-	style.Register(style.SubtotalNumber, style.NewStyle(subtotalNumberStyle))
+	styleMng.Store(simpleexcel.SubtotalNumber, simpleexcel.NewStyleFunc(subtotalNumberStyle))
 	// 当符合条件时，小计金额使用条件样式
-	style.Register(style.SubtotalNumberCondition, style.NewConditionStyle(subtotalNumberConditionStyle))
+	styleMng.Store(simpleexcel.SubtotalNumberCondition, simpleexcel.NewConditionStyleFunc(subtotalNumberConditionStyle))
 	// 用于小计金额
-	style.Register(style.SubtotalDecimals, style.NewStyle(subtotalDecimalsStyle))
+	styleMng.Store(simpleexcel.SubtotalDecimals, simpleexcel.NewStyleFunc(subtotalDecimalsStyle))
 	// 当符合条件时，小计金额使用条件样式
-	style.Register(style.SubtotalDecimalsCondition, style.NewConditionStyle(subtotalDecimalsCondition))
+	styleMng.Store(simpleexcel.SubtotalDecimalsCondition, simpleexcel.NewConditionStyleFunc(subtotalDecimalsCondition))
 }
