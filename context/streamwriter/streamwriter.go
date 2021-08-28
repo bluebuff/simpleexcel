@@ -3,33 +3,35 @@ package streamwriter
 import (
 	"fmt"
 	"github.com/bluebuff/simpleexcel/v2"
+	"github.com/bluebuff/simpleexcel/v2/context"
 	"github.com/bluebuff/simpleexcel/v2/internal"
+	"github.com/bluebuff/simpleexcel/v2/model"
 	"github.com/xuri/excelize/v2"
 )
 
-func NewContext(streamWriter *excelize.StreamWriter, styleMng simpleexcel.StyleManager) simpleexcel.Context {
-	layout := simpleexcel.Layout{Left: 1, Top: 1, Right: 2, Bottom: 1}
+func NewContext(streamWriter *excelize.StreamWriter, styleMng simpleexcel.StyleManager) context.Context {
+	layout := model.Layout{Left: 1, Top: 1, Right: 2, Bottom: 1}
 	return &streamWriterContext{
 		layout:       layout,
 		streamWriter: streamWriter,
 		rowCounter:   internal.NewCounter(layout.Top),
 		colCounter:   internal.NewCounter(layout.Left),
-		cells:        make(simpleexcel.Cells, 0, 50),
+		cells:        make(model.Cells, 0, 50),
 		styleMng:     styleMng,
 	}
 }
 
 type streamWriterContext struct {
-	simpleexcel.Context
-	layout       simpleexcel.Layout
+	context.Context
+	layout       model.Layout
 	streamWriter *excelize.StreamWriter
-	cells        simpleexcel.Cells
+	cells        model.Cells
 	rowCounter   internal.Counter
 	colCounter   internal.Counter
 	styleMng     simpleexcel.StyleManager
 }
 
-func (ctx *streamWriterContext) SetLayout(layout simpleexcel.Layout) {
+func (ctx *streamWriterContext) SetLayout(layout model.Layout) {
 	if layout.Left != 0 {
 		ctx.layout.Left = layout.Left
 		ctx.colCounter = internal.NewCounter(layout.Left)
@@ -46,7 +48,7 @@ func (ctx *streamWriterContext) SetLayout(layout simpleexcel.Layout) {
 	}
 }
 
-func (ctx *streamWriterContext) GetLayout() simpleexcel.Layout {
+func (ctx *streamWriterContext) GetLayout() model.Layout {
 	return ctx.layout
 }
 
@@ -59,7 +61,7 @@ func (ctx *streamWriterContext) SetColWidth(startIndex, endIndex int, width floa
 
 func (ctx *streamWriterContext) SetTitle(value string, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Title)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
@@ -75,7 +77,7 @@ func (ctx *streamWriterContext) SetTitleLine(value string, opts ...interface{}) 
 
 func (ctx *streamWriterContext) SetHeader(value string, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Head)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
@@ -89,20 +91,24 @@ func (ctx *streamWriterContext) SetHeaders(headers []string, opts ...interface{}
 
 func (ctx *streamWriterContext) SetFormula(formula string, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.SubtotalText)
-	cell := &simpleexcel.Cell{StyleID: styleId, Formula: formula}
+	cell := &model.Cell{StyleID: styleId, Formula: formula}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) NewLine() {
+	ctx.flush()
+	ctx.colCounter.Reset()
+	ctx.rowCounter.Incr()
+	ctx.layout.Bottom = ctx.CurrentRowCount()
+}
+
+func (ctx *streamWriterContext) flush() {
 	values := ctx.cells.ToInterface()
 	if len(values) != 0 {
 		axis := ctx.GetHorizontalAxis(-len(values))
 		ctx.streamWriter.SetRow(axis, values)
 		ctx.cells = ctx.cells[:0]
 	}
-	ctx.colCounter.Reset()
-	ctx.rowCounter.Incr()
-	ctx.layout.Bottom = ctx.CurrentRowCount()
 }
 
 func (ctx *streamWriterContext) MergeValue(hcell, vcell string) {
@@ -111,46 +117,46 @@ func (ctx *streamWriterContext) MergeValue(hcell, vcell string) {
 
 func (ctx *streamWriterContext) SetInt32(value int32, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetInt64(value int64, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetUint32(value uint32, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetUint64(value uint64, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入float32类型的数据
 func (ctx *streamWriterContext) SetFloat32(value float32, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Decimals)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入float64类型的数据
 func (ctx *streamWriterContext) SetFloat64(value float64, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Decimals)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入string类型的数据
 func (ctx *streamWriterContext) SetString(value string, opts ...interface{}) string {
 	styleId, _ := ctx.styleMng.Get(simpleexcel.Text)
-	cell := &simpleexcel.Cell{Value: value, StyleID: styleId}
+	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
@@ -166,7 +172,7 @@ func (ctx *streamWriterContext) SetStringLine(value string, opts ...interface{})
 }
 
 // 写入interface的数据，无样式
-func (ctx *streamWriterContext) SetInterface(cell *simpleexcel.Cell, opts ...interface{}) string {
+func (ctx *streamWriterContext) SetInterface(cell *model.Cell, opts ...interface{}) string {
 	// do options
 	ctx.doOptions(cell, opts...)
 	ctx.cells = append(ctx.cells, cell)
@@ -218,7 +224,7 @@ func (ctx *streamWriterContext) CurrentColCount() int {
 	return ctx.colCounter.Current()
 }
 
-func (ctx *streamWriterContext) doOptions(cell *simpleexcel.Cell, opts ...interface{}) {
+func (ctx *streamWriterContext) doOptions(cell *model.Cell, opts ...interface{}) {
 	for _, opt := range opts {
 		if opt == nil {
 			continue

@@ -1,4 +1,4 @@
-package simpleexcel
+package model
 
 type Layout struct {
 	Left   int

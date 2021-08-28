@@ -1,4 +1,4 @@
-package simpleexcel
+package model
 
 import (
 	"github.com/xuri/excelize/v2"

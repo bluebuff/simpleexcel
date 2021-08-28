@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/bluebuff/simpleexcel/v2"
-	"github.com/bluebuff/simpleexcel/v2/streamwriter"
+	"github.com/bluebuff/simpleexcel/v2/context"
+	"github.com/bluebuff/simpleexcel/v2/context/streamwriter"
 	"github.com/bluebuff/simpleexcel/v2/style/standard"
 	"github.com/xuri/excelize/v2"
 	"math/rand"
@@ -41,9 +42,9 @@ func main() {
 	file.SaveAs("./test.xlsx")
 }
 
-func do2(ctx simpleexcel.Context) {
+func do2(ctx context.Context) {
 
-	ctx.SetColWidth(1, 50, 20)
+	ctx.SetColWidth(1, 60, 20)
 
 	for i := 0; i < 50; i++ {
 		ctx.SetHeader(fmt.Sprintf("列%d", i+1))
@@ -52,7 +53,7 @@ func do2(ctx simpleexcel.Context) {
 	ctx.NewLine()
 
 	for row := 2; row <= 500; row++ {
-		for i := 0; i < 50; i++ {
+		for i := 0; i < 60; i++ {
 			ctx.SetString(fmt.Sprint(rand.Int()))
 		}
 		ctx.NewLine()
@@ -62,7 +63,7 @@ func do2(ctx simpleexcel.Context) {
 	}
 }
 
-func do(ctx simpleexcel.Context) {
+func do(ctx context.Context) {
 	ctx.SetColWidth(1, 3, 20)
 	oo := ctx.SetTitleLine("2021年学分表")
 	fmt.Println(oo)
@@ -81,8 +82,8 @@ func do(ctx simpleexcel.Context) {
 	firstAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetString("李四")
-	ctx.SetUint32(28, simpleexcel.CompareLessAndNumberConditionUint32Style(30))
-	ctx.SetFloat32(100, simpleexcel.CompareLessAndDecimalsConditionFloat32Style(200))
+	ctx.SetUint32(28, simpleexcel.CompareLessAndStyleUint32(30))
+	ctx.SetFloat32(-99, simpleexcel.CompareLessAndStyleFloat32(0))
 	lastAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetStringLine("")
@@ -90,7 +91,7 @@ func do(ctx simpleexcel.Context) {
 	d := ctx.SetHeader("小计")
 	fmt.Println(d)
 	ctx.SetHeader("")
-	f := ctx.SetFormula(fmt.Sprintf("=SUM(%s:%s)", firstAxis, lastAxis))
+	f := ctx.SetFormula(fmt.Sprintf("=SUM(%s:%s)", firstAxis, lastAxis), simpleexcel.CustomStyleByAlias(simpleexcel.SubtotalDecimalsCondition))
 	fmt.Println(f)
 	ctx.NewLine()
 	g := ctx.SetStringLine("test")

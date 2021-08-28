@@ -22,13 +22,11 @@ const (
 	SubtotalDecimalsCondition StyleNameAlias = "subtotal_decimals_condition"
 )
 
-type StyleExpress string
-
 type CallSetStyleFunc func(file *excelize.File) (int, error)
 
 type StyleManager interface {
 	Configure(opts ...func(StyleManager)) StyleManager
-	Store(alias StyleNameAlias, style interface{}) bool
+	Store(alias StyleNameAlias, style interface{}) int
 	Get(alias StyleNameAlias) (int, bool)
 }
 
@@ -49,9 +47,9 @@ func (mng *styleManager) Configure(opts ...func(StyleManager)) StyleManager {
 	return mng
 }
 
-func (mng *styleManager) Store(alias StyleNameAlias, item interface{}) bool {
-	if _, ok := mng.styleIdMap[alias]; ok {
-		return false
+func (mng *styleManager) Store(alias StyleNameAlias, item interface{}) int {
+	if id, ok := mng.styleIdMap[alias]; ok {
+		return id
 	}
 	switch v := item.(type) {
 	case int:
@@ -62,10 +60,8 @@ func (mng *styleManager) Store(alias StyleNameAlias, item interface{}) bool {
 	case CallSetStyleFunc:
 		styleId, _ := v(mng.file)
 		mng.styleIdMap[alias] = styleId
-	default:
-		return false
 	}
-	return true
+	return mng.styleIdMap[alias]
 }
 
 func (mng *styleManager) Get(alias StyleNameAlias) (int, bool) {
@@ -76,11 +72,5 @@ func (mng *styleManager) Get(alias StyleNameAlias) (int, bool) {
 func NewStyleFunc(style string) CallSetStyleFunc {
 	return func(file *excelize.File) (int, error) {
 		return file.NewStyle(style)
-	}
-}
-
-func NewConditionStyleFunc(style string) CallSetStyleFunc {
-	return func(file *excelize.File) (int, error) {
-		return file.NewConditionalStyle(style)
 	}
 }

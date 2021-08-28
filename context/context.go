@@ -1,13 +1,17 @@
-package simpleexcel
+package context
+
+import (
+	"github.com/bluebuff/simpleexcel/v2/model"
+)
 
 type Context interface {
 	// 设置列的宽度
 	SetColWidth(startIndex, endIndex int, width float64)
 
 	// 设置边界的位置，上下左右的偏移量，从1开始
-	SetLayout(layout Layout)
+	SetLayout(layout model.Layout)
 
-	GetLayout() Layout
+	GetLayout() model.Layout
 
 	// 设置大标题
 	SetTitle(value string, opts ...interface{}) string
@@ -55,7 +59,7 @@ type Context interface {
 	SetStringLine(value string, opts ...interface{}) string
 
 	// 写入interface的数据，无样式
-	SetInterface(cell *Cell, opts ...interface{}) string
+	SetInterface(cell *model.Cell, opts ...interface{}) string
 
 	// 横向计数器向后偏移一段距离，默认为1
 	Jump(offset ...int) string
