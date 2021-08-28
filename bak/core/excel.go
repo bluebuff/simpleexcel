@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/bluebuff/simple-excelize/core/common"
 	"github.com/bluebuff/simple-excelize/core/context"
 	"github.com/bluebuff/simple-excelize/models"
+	"github.com/xuri/excelize/v2"
 )
 
 type ExcelBuilder interface {

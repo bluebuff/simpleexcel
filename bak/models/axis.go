@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/xuri/excelize/v2"
 )
 
 type Axis struct {
