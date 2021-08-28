@@ -4,6 +4,8 @@ import (
 	"github.com/bluebuff/simpleexcel/v2/model"
 )
 
+type Handler func(ctx Context) error
+
 type Context interface {
 	// 设置列的宽度
 	SetColWidth(startIndex, endIndex int, width float64)

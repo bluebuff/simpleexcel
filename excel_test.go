@@ -1,48 +1,29 @@
-package main
+package simpleexcel
 
 import (
 	"fmt"
-	"github.com/bluebuff/simpleexcel/v2"
 	"github.com/bluebuff/simpleexcel/v2/context"
-	"github.com/bluebuff/simpleexcel/v2/context/streamwriter"
+	"github.com/bluebuff/simpleexcel/v2/option"
+	"github.com/bluebuff/simpleexcel/v2/style"
 	"github.com/bluebuff/simpleexcel/v2/style/standard"
-	"github.com/xuri/excelize/v2"
 	"math/rand"
+	"testing"
 )
 
-func main() {
-	file := excelize.NewFile()
-
-	// style
-	styleManager := simpleexcel.NewStyleManager(file).Configure(standard.Style)
-
-	// sheet1
-	sw, err := file.NewStreamWriter("Sheet1")
+func TestNewStreamWriterExcelBuilder(t *testing.T) {
+	builder := NewStreamWriterExcelBuilder(standard.Style)
+	builder.JoinSheet("学生成绩表", do)
+	builder.JoinSheet("批量数据", do2)
+	builder.Active("批量数据")
+	reader, err := builder.Build()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	ctx := streamwriter.NewContext(sw, styleManager)
-	do(ctx)
-	sw.Flush()
-
-	// sheet2
-	file.NewSheet("Sheet2")
-	sw, err = file.NewStreamWriter("Sheet2")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	ctx = streamwriter.NewContext(sw, styleManager)
-	do2(ctx)
-	sw.Flush()
-
-	// save
-	file.SaveAs("./test.xlsx")
+	fmt.Println(reader)
 }
 
-func do2(ctx context.Context) {
+func do2(ctx context.Context) error {
 
 	ctx.SetColWidth(1, 60, 20)
 
@@ -61,9 +42,11 @@ func do2(ctx context.Context) {
 			ctx.MergeValue(fmt.Sprintf("A%d", row-4), fmt.Sprintf("A%d", row))
 		}
 	}
+
+	return nil
 }
 
-func do(ctx context.Context) {
+func do(ctx context.Context) error {
 	ctx.SetColWidth(1, 3, 20)
 	oo := ctx.SetTitleLine("2021年学分表")
 	fmt.Println(oo)
@@ -82,8 +65,8 @@ func do(ctx context.Context) {
 	firstAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetString("李四")
-	ctx.SetUint32(28, simpleexcel.CompareLessAndStyleUint32(30))
-	ctx.SetFloat32(-99, simpleexcel.CompareLessAndStyleFloat32(0))
+	ctx.SetUint32(28, option.CompareLessAndStyleUint32(30))
+	ctx.SetFloat32(-99, option.CompareLessAndStyleFloat32(0))
 	lastAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetStringLine("")
@@ -91,7 +74,7 @@ func do(ctx context.Context) {
 	d := ctx.SetHeader("小计")
 	fmt.Println(d)
 	ctx.SetHeader("")
-	f := ctx.SetFormula(fmt.Sprintf("=SUM(%s:%s)", firstAxis, lastAxis), simpleexcel.CustomStyleByAlias(simpleexcel.SubtotalDecimalsCondition))
+	f := ctx.SetFormula(fmt.Sprintf("=SUM(%s:%s)", firstAxis, lastAxis), option.CustomStyleByAlias(style.SubtotalDecimalsCondition))
 	fmt.Println(f)
 	ctx.NewLine()
 	g := ctx.SetStringLine("test")
@@ -106,4 +89,5 @@ func do(ctx context.Context) {
 	ctx.SetString("Cell2--")
 	ctx.NewLine()
 	ctx.MergeValue(hcell, vcell)
+	return nil
 }

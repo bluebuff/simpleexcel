@@ -2,14 +2,15 @@ package streamwriter
 
 import (
 	"fmt"
-	"github.com/bluebuff/simpleexcel/v2"
 	"github.com/bluebuff/simpleexcel/v2/context"
 	"github.com/bluebuff/simpleexcel/v2/internal"
 	"github.com/bluebuff/simpleexcel/v2/model"
+	"github.com/bluebuff/simpleexcel/v2/option"
+	"github.com/bluebuff/simpleexcel/v2/style"
 	"github.com/xuri/excelize/v2"
 )
 
-func NewContext(streamWriter *excelize.StreamWriter, styleMng simpleexcel.StyleManager) context.Context {
+func NewContext(streamWriter *excelize.StreamWriter, styleMng style.StyleManager) context.Context {
 	layout := model.Layout{Left: 1, Top: 1, Right: 2, Bottom: 1}
 	return &streamWriterContext{
 		layout:       layout,
@@ -28,7 +29,7 @@ type streamWriterContext struct {
 	cells        model.Cells
 	rowCounter   internal.Counter
 	colCounter   internal.Counter
-	styleMng     simpleexcel.StyleManager
+	styleMng     style.StyleManager
 }
 
 func (ctx *streamWriterContext) SetLayout(layout model.Layout) {
@@ -60,7 +61,7 @@ func (ctx *streamWriterContext) SetColWidth(startIndex, endIndex int, width floa
 }
 
 func (ctx *streamWriterContext) SetTitle(value string, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Title)
+	styleId, _ := ctx.styleMng.Get(style.Title)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
@@ -76,7 +77,7 @@ func (ctx *streamWriterContext) SetTitleLine(value string, opts ...interface{}) 
 }
 
 func (ctx *streamWriterContext) SetHeader(value string, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Head)
+	styleId, _ := ctx.styleMng.Get(style.Head)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
@@ -90,7 +91,7 @@ func (ctx *streamWriterContext) SetHeaders(headers []string, opts ...interface{}
 }
 
 func (ctx *streamWriterContext) SetFormula(formula string, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.SubtotalText)
+	styleId, _ := ctx.styleMng.Get(style.SubtotalText)
 	cell := &model.Cell{StyleID: styleId, Formula: formula}
 	return ctx.SetInterface(cell, opts...)
 }
@@ -116,46 +117,46 @@ func (ctx *streamWriterContext) MergeValue(hcell, vcell string) {
 }
 
 func (ctx *streamWriterContext) SetInt32(value int32, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
+	styleId, _ := ctx.styleMng.Get(style.Number)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetInt64(value int64, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
+	styleId, _ := ctx.styleMng.Get(style.Number)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetUint32(value uint32, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
+	styleId, _ := ctx.styleMng.Get(style.Number)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 func (ctx *streamWriterContext) SetUint64(value uint64, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Number)
+	styleId, _ := ctx.styleMng.Get(style.Number)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入float32类型的数据
 func (ctx *streamWriterContext) SetFloat32(value float32, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Decimals)
+	styleId, _ := ctx.styleMng.Get(style.Decimals)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入float64类型的数据
 func (ctx *streamWriterContext) SetFloat64(value float64, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Decimals)
+	styleId, _ := ctx.styleMng.Get(style.Decimals)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
 
 // 写入string类型的数据
 func (ctx *streamWriterContext) SetString(value string, opts ...interface{}) string {
-	styleId, _ := ctx.styleMng.Get(simpleexcel.Text)
+	styleId, _ := ctx.styleMng.Get(style.Text)
 	cell := &model.Cell{Value: value, StyleID: styleId}
 	return ctx.SetInterface(cell, opts...)
 }
@@ -230,7 +231,7 @@ func (ctx *streamWriterContext) doOptions(cell *model.Cell, opts ...interface{})
 			continue
 		}
 		switch v := opt.(type) {
-		case simpleexcel.Handler:
+		case option.Option:
 			v(ctx.styleMng, cell)
 		}
 	}
