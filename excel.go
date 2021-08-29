@@ -27,7 +27,7 @@ func NewStreamWriterExcelBuilder(opts ...func(style.StyleManager)) ExcelBuilder 
 		sheetHandles:   make(map[string][]context.Handler, 5),
 		beforeHandlers: make([]context.Handler, 0),
 		afterHandlers:  make([]context.Handler, 0),
-		StyleManager:   style.NewStyleManager(file).Configure(opts...),
+		StyleManager:   style.NewStyleManager(file, opts...),
 	}
 }
 
