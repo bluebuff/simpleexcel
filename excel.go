@@ -5,7 +5,6 @@ import (
 	"github.com/bluebuff/simpleexcel/v2/context/streamwriter"
 	"github.com/bluebuff/simpleexcel/v2/style"
 	"github.com/xuri/excelize/v2"
-	"io"
 	"io/ioutil"
 	"os"
 )
@@ -17,7 +16,7 @@ type ExcelBuilder interface {
 	Active(sheetName string)
 	Before(handle context.Handler)
 	After(handle context.Handler)
-	Build() (io.Reader, error)
+	Build() (*os.File, error)
 }
 
 func NewStreamWriterExcelBuilder(opts ...func(style.StyleManager)) ExcelBuilder {
@@ -54,7 +53,7 @@ func (builder *streamWriterExcelBuilder) JoinSheet(sheetName string, handler ...
 	builder.sheetHandles[sheetName] = append(builder.sheetHandles[sheetName], handler...)
 }
 
-func (builder *streamWriterExcelBuilder) Build() (io.Reader, error) {
+func (builder *streamWriterExcelBuilder) Build() (*os.File, error) {
 
 	for i, sheetName := range builder.sheetNames {
 		if i == 0 {

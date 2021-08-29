@@ -15,12 +15,13 @@ func TestNewStreamWriterExcelBuilder(t *testing.T) {
 	builder.JoinSheet("学生成绩表", do)
 	builder.JoinSheet("批量数据", do2)
 	builder.Active("批量数据")
-	reader, err := builder.Build()
+	file, err := builder.Build()
+	defer file.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(reader)
+	fmt.Println(file)
 }
 
 func do2(ctx context.Context) error {
