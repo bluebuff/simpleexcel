@@ -17,7 +17,7 @@ type ExcelBuilder interface {
 	Active(sheetName string)
 	Before(handle context.Handler)
 	After(handle context.Handler)
-	Build() (*os.File, error)
+	Build() (string, error)
 	WriteTo(w io.Writer) (int64, error)
 }
 
@@ -62,20 +62,21 @@ func (builder *streamWriterExcelBuilder) WriteTo(w io.Writer) (int64, error) {
 	return builder.file.WriteTo(w)
 }
 
-func (builder *streamWriterExcelBuilder) Build() (*os.File, error) {
+func (builder *streamWriterExcelBuilder) Build() (string, error) {
 	// build
 	if err := builder.build(); err != nil {
-		return nil, err
+		return "", err
 	}
 	// write temp file
 	tmp, err := ioutil.TempFile(os.TempDir(), TempFilePattern)
+	defer tmp.Close()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if _, err := builder.file.WriteTo(tmp); err != nil {
-		return nil, err
+		return "", err
 	}
-	return tmp, nil
+	return tmp.Name(), nil
 }
 
 func (builder *streamWriterExcelBuilder) build() error {
