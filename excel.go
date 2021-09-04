@@ -5,6 +5,7 @@ import (
 	"github.com/bluebuff/simpleexcel/v2/context/streamwriter"
 	"github.com/bluebuff/simpleexcel/v2/style"
 	"github.com/xuri/excelize/v2"
+	"io"
 	"io/ioutil"
 	"os"
 )
@@ -17,6 +18,7 @@ type ExcelBuilder interface {
 	Before(handle context.Handler)
 	After(handle context.Handler)
 	Build() (*os.File, error)
+	WriteTo(w io.Writer) (int64, error)
 }
 
 func NewStreamWriterExcelBuilder(opts ...func(style.StyleManager)) ExcelBuilder {
@@ -53,49 +55,18 @@ func (builder *streamWriterExcelBuilder) JoinSheet(sheetName string, handler ...
 	builder.sheetHandles[sheetName] = append(builder.sheetHandles[sheetName], handler...)
 }
 
-func (builder *streamWriterExcelBuilder) Build() (*os.File, error) {
-
-	for i, sheetName := range builder.sheetNames {
-		if i == 0 {
-			builder.file.SetSheetName("Sheet1", sheetName)
-		} else {
-			builder.file.NewSheet(sheetName)
-		}
-		sw, err := builder.file.NewStreamWriter(sheetName)
-		if err != nil {
-			return nil, err
-		}
-		// new context
-		ctx := streamwriter.NewContext(sw, builder.StyleManager)
-		// before
-		if builder.beforeHandlers != nil && len(builder.beforeHandlers) != 0 {
-			for _, handler := range builder.beforeHandlers {
-				if err := handler(ctx); err != nil {
-					return nil, err
-				}
-			}
-		}
-		for _, handler := range builder.sheetHandles[sheetName] {
-			if err := handler(ctx); err != nil {
-				return nil, err
-			}
-		}
-		// after
-		if builder.afterHandlers != nil && len(builder.afterHandlers) != 0 {
-			for _, handler := range builder.afterHandlers {
-				if err := handler(ctx); err != nil {
-					return nil, err
-				}
-			}
-		}
-		if err := sw.Flush(); err != nil {
-			return nil, err
-		}
+func (builder *streamWriterExcelBuilder) WriteTo(w io.Writer) (int64, error) {
+	if err := builder.build(); err != nil {
+		return 0, err
 	}
+	return builder.file.WriteTo(w)
+}
 
-	index := builder.file.GetSheetIndex(builder.activeSheetName)
-	builder.file.SetActiveSheet(index)
-
+func (builder *streamWriterExcelBuilder) Build() (*os.File, error) {
+	// build
+	if err := builder.build(); err != nil {
+		return nil, err
+	}
 	// write temp file
 	tmp, err := ioutil.TempFile(os.TempDir(), TempFilePattern)
 	if err != nil {
@@ -105,6 +76,50 @@ func (builder *streamWriterExcelBuilder) Build() (*os.File, error) {
 		return nil, err
 	}
 	return tmp, nil
+}
+
+func (builder *streamWriterExcelBuilder) build() error {
+	for i, sheetName := range builder.sheetNames {
+		if i == 0 {
+			builder.file.SetSheetName("Sheet1", sheetName)
+		} else {
+			builder.file.NewSheet(sheetName)
+		}
+		sw, err := builder.file.NewStreamWriter(sheetName)
+		if err != nil {
+			return err
+		}
+		// new context
+		ctx := streamwriter.NewContext(sw, builder.StyleManager)
+		// before
+		if builder.beforeHandlers != nil && len(builder.beforeHandlers) != 0 {
+			for _, handler := range builder.beforeHandlers {
+				if err := handler(ctx); err != nil {
+					return err
+				}
+			}
+		}
+		for _, handler := range builder.sheetHandles[sheetName] {
+			if err := handler(ctx); err != nil {
+				return err
+			}
+		}
+		// after
+		if builder.afterHandlers != nil && len(builder.afterHandlers) != 0 {
+			for _, handler := range builder.afterHandlers {
+				if err := handler(ctx); err != nil {
+					return err
+				}
+			}
+		}
+		if err := sw.Flush(); err != nil {
+			return err
+		}
+	}
+
+	index := builder.file.GetSheetIndex(builder.activeSheetName)
+	builder.file.SetActiveSheet(index)
+	return nil
 }
 
 func (builder *streamWriterExcelBuilder) Before(handle context.Handler) {
