@@ -13,13 +13,6 @@ const (
 	GT compareSymbol = ">"
 )
 
-func getSymbol(symbols ...compareSymbol) compareSymbol {
-	for _, item := range symbols {
-		return item
-	}
-	return LT
-}
-
 // int32
 func cmpInt32(a, b int32, c compareSymbol) (r bool) {
 	switch {

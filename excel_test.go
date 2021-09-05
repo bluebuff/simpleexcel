@@ -15,13 +15,12 @@ func TestNewStreamWriterExcelBuilder(t *testing.T) {
 	builder.JoinSheet("学生成绩表", do)
 	builder.JoinSheet("批量数据", do2)
 	builder.Active("批量数据")
-	file, err := builder.Build()
-	defer file.Close()
+	fileName, err := builder.Build()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(file)
+	fmt.Println(fileName)
 }
 
 func do2(ctx context.Context) error {
@@ -66,8 +65,8 @@ func do(ctx context.Context) error {
 	firstAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetString("李四")
-	ctx.SetUint32(55, option.CompareAndStyleUint32(55, option.LE))
-	ctx.SetFloat32(100, option.CompareAndStyleFloat32(100, option.EQ))
+	ctx.SetUint32(55, option.CompareAndStyleUint32(option.LE, 55))
+	ctx.SetFloat32(100, option.CompareAndStyleFloat32(option.EQ, 100))
 	lastAxis := ctx.LastAxis()
 	ctx.NewLine()
 	ctx.SetStringLine("")
@@ -81,7 +80,7 @@ func do(ctx context.Context) error {
 	g := ctx.SetStringLine("test")
 	fmt.Println(g)
 	ctx.NewLine()
-	hcell := ctx.SetString("Cell1")
+	hcell := ctx.SetString("", option.WhenEmptyAndSwapString("-"))
 	ctx.SetString("Cell1-")
 	ctx.SetString("Cell1--")
 	ctx.NewLine()
