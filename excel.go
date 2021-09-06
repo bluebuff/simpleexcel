@@ -2,7 +2,6 @@ package simpleexcel
 
 import (
 	"github.com/bluebuff/simpleexcel/v2/context"
-	"github.com/bluebuff/simpleexcel/v2/context/streamwriter"
 	"github.com/bluebuff/simpleexcel/v2/style"
 	"github.com/xuri/excelize/v2"
 	"io"
@@ -21,15 +20,19 @@ type ExcelBuilder interface {
 	WriteTo(w io.Writer) (int64, error)
 }
 
-func NewStreamWriterExcelBuilder(opts ...func(style.StyleManager)) ExcelBuilder {
+func NewExcelBuilder(m mode, opts ...func(style.StyleManager)) ExcelBuilder {
 	file := excelize.NewFile()
+	styleManager := style.NewStyleManager(file, opts...)
+	factory := newSimpleFactory(file, styleManager)
 	return &streamWriterExcelBuilder{
 		file:           file,
 		sheetNames:     make([]string, 0, 5),
 		sheetHandles:   make(map[string][]context.Handler, 5),
 		beforeHandlers: make([]context.Handler, 0),
 		afterHandlers:  make([]context.Handler, 0),
-		StyleManager:   style.NewStyleManager(file, opts...),
+		StyleManager:   styleManager,
+		factory:        factory,
+		mode:           m,
 	}
 }
 
@@ -41,6 +44,8 @@ type streamWriterExcelBuilder struct {
 	afterHandlers   []context.Handler
 	activeSheetName string
 	StyleManager    style.StyleManager
+	factory         Factory
+	mode            mode
 	ExcelBuilder
 }
 
@@ -86,12 +91,11 @@ func (builder *streamWriterExcelBuilder) build() error {
 		} else {
 			builder.file.NewSheet(sheetName)
 		}
-		sw, err := builder.file.NewStreamWriter(sheetName)
+		// new context
+		ctx, done, err := builder.factory.New(sheetName, builder.mode)
 		if err != nil {
 			return err
 		}
-		// new context
-		ctx := streamwriter.NewContext(sw, builder.StyleManager)
 		// before
 		if builder.beforeHandlers != nil && len(builder.beforeHandlers) != 0 {
 			for _, handler := range builder.beforeHandlers {
@@ -113,7 +117,7 @@ func (builder *streamWriterExcelBuilder) build() error {
 				}
 			}
 		}
-		if err := sw.Flush(); err != nil {
+		if err := done(); err != nil {
 			return err
 		}
 	}

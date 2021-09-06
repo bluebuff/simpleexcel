@@ -11,24 +11,24 @@ import (
 )
 
 func TestNewStreamWriterExcelBuilder(t *testing.T) {
-	builder := NewStreamWriterExcelBuilder(standard.Style)
+	// builder := NewExcelBuilder(Normal, standard.Style)
+	builder := NewExcelBuilder(StreamWrite, standard.Style)
 	builder.JoinSheet("学生成绩表", do)
 	builder.JoinSheet("批量数据", do2)
 	builder.Active("批量数据")
-	file, err := builder.Build()
-	defer file.Close()
+	fileName, err := builder.Build()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(file)
+	fmt.Println(fileName)
 }
 
 func do2(ctx context.Context) error {
 
 	ctx.SetColWidth(1, 60, 20)
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 60; i++ {
 		ctx.SetHeader(fmt.Sprintf("列%d", i+1))
 	}
 
