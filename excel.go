@@ -24,7 +24,7 @@ func NewExcelBuilder(m mode, opts ...func(style.StyleManager)) ExcelBuilder {
 	file := excelize.NewFile()
 	styleManager := style.NewStyleManager(file, opts...)
 	factory := newSimpleFactory(file, styleManager)
-	return &streamWriterExcelBuilder{
+	return &excelBuilder{
 		file:           file,
 		sheetNames:     make([]string, 0, 5),
 		sheetHandles:   make(map[string][]context.Handler, 5),
@@ -36,7 +36,7 @@ func NewExcelBuilder(m mode, opts ...func(style.StyleManager)) ExcelBuilder {
 	}
 }
 
-type streamWriterExcelBuilder struct {
+type excelBuilder struct {
 	file            *excelize.File
 	sheetNames      []string
 	beforeHandlers  []context.Handler
@@ -49,25 +49,25 @@ type streamWriterExcelBuilder struct {
 	ExcelBuilder
 }
 
-func (builder *streamWriterExcelBuilder) Active(sheetName string) {
+func (builder *excelBuilder) Active(sheetName string) {
 	builder.activeSheetName = sheetName
 }
 
-func (builder *streamWriterExcelBuilder) JoinSheet(sheetName string, handler ...context.Handler) {
+func (builder *excelBuilder) JoinSheet(sheetName string, handler ...context.Handler) {
 	if _, ok := builder.sheetHandles[sheetName]; !ok {
 		builder.sheetNames = append(builder.sheetNames, sheetName)
 	}
 	builder.sheetHandles[sheetName] = append(builder.sheetHandles[sheetName], handler...)
 }
 
-func (builder *streamWriterExcelBuilder) WriteTo(w io.Writer) (int64, error) {
+func (builder *excelBuilder) WriteTo(w io.Writer) (int64, error) {
 	if err := builder.build(); err != nil {
 		return 0, err
 	}
 	return builder.file.WriteTo(w)
 }
 
-func (builder *streamWriterExcelBuilder) Build() (string, error) {
+func (builder *excelBuilder) Build() (string, error) {
 	// build
 	if err := builder.build(); err != nil {
 		return "", err
@@ -84,7 +84,7 @@ func (builder *streamWriterExcelBuilder) Build() (string, error) {
 	return tmp.Name(), nil
 }
 
-func (builder *streamWriterExcelBuilder) build() error {
+func (builder *excelBuilder) build() error {
 	for i, sheetName := range builder.sheetNames {
 		if i == 0 {
 			builder.file.SetSheetName("Sheet1", sheetName)
@@ -127,10 +127,10 @@ func (builder *streamWriterExcelBuilder) build() error {
 	return nil
 }
 
-func (builder *streamWriterExcelBuilder) Before(handle context.Handler) {
+func (builder *excelBuilder) Before(handle context.Handler) {
 	builder.beforeHandlers = append(builder.beforeHandlers, handle)
 }
 
-func (builder *streamWriterExcelBuilder) After(handle context.Handler) {
+func (builder *excelBuilder) After(handle context.Handler) {
 	builder.afterHandlers = append(builder.afterHandlers, handle)
 }
